@@ -1,0 +1,13 @@
+# GastroCorp NER 2026 — Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core
+transformers>=4.35.0
+datasets>=2.14.0
+torch>=2.0.0
+
+# Evaluation
+seqeval>=1.2.2
+
+# Utilities
+numpy>=1.24.0
