@@ -1,5 +1,5 @@
 """
-baseline_transformer.py — Fine-tuning de modelo preentrenado para NER gastronómico.
+baseline_transformer.py
 
 Entrena un modelo de token classification sobre el corpus GastroCorp y genera
 predicciones en el formato requerido por Codabench.
@@ -20,13 +20,6 @@ Uso:
         --output predictions/menu_dev_xlmr.csv \\
         --epochs 5 --batch_size 16
 
-Modelos recomendados:
-    bert-base-multilingual-cased        mBERT  — buen punto de partida
-    dccuchile/bert-base-spanish-wwm-cased  BETO — mejor para textos en español
-    xlm-roberta-base                    XLM-R  — estado del arte multilingüe
-
-Requisitos:
-    pip install transformers datasets torch seqeval
 """
 
 import json
@@ -46,7 +39,6 @@ from transformers import (
 import numpy as np
 
 
-# ── Etiquetas IOB2 ────────────────────────────────────────────────────────────
 
 LABELS = [
     "O",
@@ -59,7 +51,6 @@ LABEL2ID = {l: i for i, l in enumerate(LABELS)}
 ID2LABEL  = {i: l for i, l in enumerate(LABELS)}
 
 
-# ── Carga de datos ────────────────────────────────────────────────────────────
 
 def load_jsonl(path: str) -> list[dict]:
     with open(path, encoding="utf-8") as f:
@@ -125,7 +116,6 @@ class NERDataset(Dataset):
         }
 
 
-# ── Métricas ──────────────────────────────────────────────────────────────────
 
 def compute_metrics(eval_pred):
     """Calcula F1 span-level usando seqeval."""
@@ -168,7 +158,6 @@ def compute_metrics(eval_pred):
         return {"f1_micro": round(f1, 4)}
 
 
-# ── Generación de predicciones ────────────────────────────────────────────────
 
 def predict_and_save(model, tokenizer, dataset_obj, output_path: str):
     """Genera predicciones en el formato requerido por Codabench."""
@@ -203,7 +192,6 @@ def predict_and_save(model, tokenizer, dataset_obj, output_path: str):
     print(f"  Predictions saved to: {output_path}")
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(

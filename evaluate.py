@@ -14,10 +14,6 @@ Uso:
         --gold menu_train.jsonl \\
         --pred predictions/my_predictions.csv \\
         --labels DISH BRAND
-
-Nota: Para validar durante el desarrollo, evalúa sobre el conjunto de
-entrenamiento (ya que dev no incluye etiquetas). El servidor de Codabench
-usa los labels reales de dev/test para el leaderboard oficial.
 """
 
 import json
@@ -25,9 +21,6 @@ import csv
 import argparse
 from collections import defaultdict
 from pathlib import Path
-
-
-# ── Lectura de archivos ───────────────────────────────────────────────────────
 
 def load_gold(path: str) -> dict[str, list[str]]:
     """Carga el gold standard desde JSONL. Retorna {seq_id: [tags]}."""
@@ -56,8 +49,6 @@ def load_predictions(path: str) -> dict[str, dict[int, str]]:
     return dict(preds)
 
 
-# ── Extracción de spans ───────────────────────────────────────────────────────
-
 def extract_spans(tags: list[str]) -> set[tuple]:
     """Extrae spans (entity_type, start, end) de una secuencia IOB2."""
     spans = set()
@@ -81,8 +72,6 @@ def extract_spans(tags: list[str]) -> set[tuple]:
 
     return spans
 
-
-# ── Evaluación ────────────────────────────────────────────────────────────────
 
 def evaluate(gold_map: dict, pred_map: dict,
              filter_labels: list[str] = None) -> dict:
@@ -120,7 +109,7 @@ def evaluate(gold_map: dict, pred_map: dict,
                 per_label[span[0]]["fp"] += 1
 
     if missing_seqs:
-        print(f"  ⚠️  {len(missing_seqs)} sequences missing from predictions")
+        print(f"  {len(missing_seqs)} sequences missing from predictions")
         print(f"     First missing: {missing_seqs[:3]}")
 
     # Calcular métricas por label

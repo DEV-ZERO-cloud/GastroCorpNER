@@ -1,12 +1,5 @@
 """
-baseline_majority_ud.py — CRF con features de Dependencias Universales para GastroCorp NER 2026.
-
-Extiende el baseline CRF original añadiendo features sintácticas del árbol UD:
-  - POS tag universal (NOUN, VERB, ADJ, …)
-  - Relación de dependencia del token (nsubj, obj, amod, …)
-  - POS y texto de la cabeza sintáctica
-  - Relaciones de los hijos directos
-  - Señal de verbo culinario en la cabeza (feature dominio-específico)
+baseline_majority.py
 
 Uso:
     python baselines/baseline_majority_ud.py \\
@@ -27,9 +20,7 @@ from pathlib import Path
 
 import spacy
 
-# ─── Modelo spaCy (cargado una sola vez) ──────────────────────────────────────
-# es_core_news_lg ofrece mejor precisión en texto gastronómico que el modelo sm.
-# Si el entorno es muy limitado en memoria, sustituir por es_core_news_sm.
+
 try:
     NLP = spacy.load("es_core_news_lg")
 except OSError:
@@ -38,7 +29,6 @@ except OSError:
         "  python -m spacy download es_core_news_lg"
     )
 
-# ─── Utilidades UD ────────────────────────────────────────────────────────────
 
 def tokens_to_spacy_doc(tokens: list[str]) -> spacy.tokens.Doc:
     """
@@ -46,7 +36,6 @@ def tokens_to_spacy_doc(tokens: list[str]) -> spacy.tokens.Doc:
     respetando la tokenización original del dataset (sin re-tokenizar).
     """
     doc = spacy.tokens.Doc(NLP.vocab, words=tokens)
-    # Aplicar solo tagger y parser (no tokenizer, ya está hecho)
     for pipe_name in ("tagger", "parser"):
         if pipe_name in NLP.pipe_names:
             NLP.get_pipe(pipe_name)(doc)
@@ -58,9 +47,6 @@ def child_deps(token) -> str:
     deps = sorted(child.dep_ for child in token.children)
     return "|".join(deps) if deps else "NONE"
 
-
-
-# ─── Extracción de features ───────────────────────────────────────────────────
 
 def extract_features(tokens: list[str], domain: str = None) -> list[dict]:
     """
@@ -173,8 +159,6 @@ def extract_features(tokens: list[str], domain: str = None) -> list[dict]:
 
     return features
 
-
-# ─── I/O ──────────────────────────────────────────────────────────────────────
 
 def load_jsonl(path: str) -> list[dict]:
     with open(path, encoding="utf-8") as f:
